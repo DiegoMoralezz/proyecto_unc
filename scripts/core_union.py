@@ -1,0 +1,1 @@
+# EXTRAER lógica de unir_documentos aquí

@@ -1,0 +1,596 @@
+{
+  "Portada": [
+    {
+      "rango": "B3:B4",
+      "tipo": "titulo_portada"
+    },
+    {
+      "rango": "B5:B6",
+      "tipo": "subtitulo_portada"
+    }
+  ],
+  "Dictamen 1": [
+    {
+      "rango": "B5:B9",
+      "tipo": "alcomite_informeaud"
+    },
+    {
+      "rango": "B10:B10",
+      "tipo": "titulo_fidyinf"
+    },
+    {
+      "rango": "B11:B14",
+      "tipo": "negritainformeaud"
+    },
+    {
+      "rango": "B15:B16",
+      "tipo": "textoinformeaud"
+    },
+    {
+      "rango": "B17:B17",
+      "tipo": "negritainformeaud"
+    },
+    {
+      "rango": "B18:B18",
+      "tipo": "textoinformeaud"
+    },
+    {
+      "rango": "B19:B19",
+      "tipo": "negritainformeaud"
+    },
+    {
+      "rango": "B20:B22",
+      "tipo": "textoinformeaud"
+    }
+  ],
+  "Dictamen 2": [
+    {
+      "rango": "B4:B4",
+      "tipo": "negritainformeaud"
+    },
+    {
+      "rango": "B5:B7",
+      "tipo": "textoinformeaud"
+    },
+    {
+      "rango": "B8:B13",
+      "tipo": "viñetasinformeaud"
+    },
+    {
+      "rango": "B14:B15",
+      "tipo": "textoinformeaud"
+    },
+    {
+      "rango": "B16:B20",
+      "tipo": "firmainformeaud"
+    }
+  ],
+  "Nota 1 y 2": [
+    {
+      "rango": "B2:B4",
+      "tipo": "titulo_fidyinf"
+    },
+    {
+      "rango": "B5:B5",
+      "tipo": "titulo_general"
+    },
+    {
+      "rango": "B6:B7",
+      "tipo": "subitulo_estynot"
+    },
+    {
+      "rango": "B8:B8",
+      "tipo": "textoinformeaud"
+    },
+    {
+      "rango": "B9:B9",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B10:B12",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B13:B13",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B14:B14",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B15:B21",
+      "tipo": "circulo_notas"
+    },
+    {
+      "rango": "B22:B22",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B23:B23",
+      "tipo": "subrayado_notas"
+    },
+    {
+      "rango": "B24:B27",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B28:B28",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B29:B29",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B30:B33",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B34:B36",
+      "tipo": "sangria_notas"
+    },
+    {
+      "rango": "B37:B38",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B39:B44",
+      "tipo": "circulo_notas"
+    },
+    {
+      "rango": "B45:B45",
+      "tipo": "subrayado_notas"
+    },
+    {
+      "rango": "B46:B46",
+      "tipo": "sangria_notas"
+    },
+    {
+      "rango": "B47:B48",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B49:B50",
+      "tipo": "sangria_notas"
+    },
+    {
+      "rango": "B51:B51",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B52:B52",
+      "tipo": "subrayado_notas"
+    },
+    {
+      "rango": "B53:B53",
+      "tipo": "texto_notas"
+    }
+  ],
+  "Nota 3": [
+    {
+      "rango": "B4:B4",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B5:B6",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B7:B7",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B8:B10",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B11:B11",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B12:B18",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B19:B19",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B20:B22",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B23:B23",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B24:B30",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B31:B31",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B32:B33",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B34:B34",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B35:B38",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B39:B39",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B40:B40",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B41:B41",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B42:B42",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B43:B43",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B44:B44",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B45:B48",
+      "tipo": "romanos_notas"
+    },
+    {
+      "rango": "B49:B49",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B50:B50",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B51:B51",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B52:B52",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B53:B53",
+      "tipo": "abc_notas"
+    },
+    {
+      "rango": "B54:B54",
+      "tipo": "texto_notas"
+    }
+  ],
+  "Nota 5 Txt": [
+    {
+      "rango": "B5:B5",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B6:B9",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B10:B14",
+      "tipo": "romanos_notas"
+    },
+    {
+      "rango": "B15:B16",
+      "tipo": "texto_notas"
+    }
+  ],
+  "Nota 10 Impuestos": [
+    {
+      "rango": "B7:B7",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B9:B9",
+      "tipo": "texto_notas"
+    }
+  ],
+  "Nota de la 14 en adelante": [
+    {
+      "rango": "B4:B4",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B5:B10",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B11:B11",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B12:B14",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B15:B15",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B16:B16",
+      "tipo": "texto_notas"
+    }
+  ],
+  "Contenido": [
+    {
+      "rango": "B6:B7",
+      "tipo": "titulo_fidyinf"
+    },
+    {
+      "rango": "B8:B9",
+      "tipo": "subtitulo_tablacontenido"
+    },
+    {
+      "rango": "B12:C21",
+      "tipo": "tabla_contenido"
+    }
+  ],
+  "BG": [
+    {
+      "rango": "B5:B7",
+      "tipo": "titulo_fidyinf"
+    },
+    {
+      "rango": "B8:B8",
+      "tipo": "titulo_general"
+    },
+    {
+      "rango": "B9:B11",
+      "tipo": "subitulo_estynot"
+    },
+    {
+      "rango": "B12:G48",
+      "tipo": "tabla_bg"
+    }
+  ],
+  "ER": [
+    {
+      "rango": "B5:B7",
+      "tipo": "titulo_fidyinf"
+    },
+    {
+      "rango": "B8:B8",
+      "tipo": "titulo_general"
+    },
+    {
+      "rango": "B9:B11",
+      "tipo": "subitulo_estynot"
+    },
+    {
+      "rango": "B12:G25",
+      "tipo": "tabla_er"
+    }
+  ],
+  "ECC": [
+    {
+      "rango": "B7:B9",
+      "tipo": "titulo_fidyinf"
+    },
+    {
+      "rango": "B10:B10",
+      "tipo": "titulo_general"
+    },
+    {
+      "rango": "B11:B14",
+      "tipo": "subitulo_estynot"
+    },
+    {
+      "rango": "B15:J34",
+      "tipo": "tabla_ecc"
+    }
+  ],
+  "CF": [
+    {
+      "rango": "B7:B9",
+      "tipo": "titulo_fidyinf"
+    },
+    {
+      "rango": "B10:B10",
+      "tipo": "titulo_general"
+    },
+    {
+      "rango": "B11:B13",
+      "tipo": "subitulo_estynot"
+    },
+    {
+      "rango": "B14:F52",
+      "tipo": "tabla_cf"
+    }
+  ],
+  "Nota 1 tablas": [
+    {
+      "rango": "D4:F8",
+      "tipo": "tabla_nota1"
+    },
+    {
+      "rango": "B9:B10",
+      "tipo": "subrayado_notas"
+    },
+    {
+      "rango": "B11:B11",
+      "tipo": "texto_notas"
+    }
+  ],
+  "N4 Efectivo": [
+    {
+      "rango": "B3:B3",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B5:B5",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "E8:I12",
+      "tipo": "tabla_nota"
+    }
+  ],
+  "N5 Inventarios Inm(Tablas)": [
+    {
+      "rango": "B3:F17",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "B21:F27",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "B31:B32",
+      "tipo": "texto_notas"
+    }
+  ],
+  "N6 Proveedores": [
+    {
+      "rango": "B3:B3",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B5:B6",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "E8:I14",
+      "tipo": "tabla_nota"
+    }
+  ],
+  "N7 Depósitos en garantía": [
+    {
+      "rango": "B2:B2",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B4:B5",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "D8:H16",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "B7:B7",
+      "tipo": "texto_notas"
+    }
+  ],
+  "N8 Préstamos": [
+    {
+      "rango": "B3:B3",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B5:B6",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "F10:J13",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "B7:B9",
+      "tipo": "texto_notas"
+    }
+  ],
+  "N9 Otras Aportaciones Fid": [
+    {
+      "rango": "B3:B3",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B4:B5",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "F15:J18",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "B5:B6",
+      "tipo": "tabla_nota"
+    }
+  ],
+  "N11 Patrimonio": [
+    {
+      "rango": "B3:B3",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B4:B5",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "D24:I27",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "B5:B7",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B8:B11",
+      "tipo": "circulo_notas"
+    },
+    {
+      "rango": "B12:B15",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "B16:B17",
+      "tipo": "romanos_notas"
+    }
+  ],
+  "N12 Vencimientos": [
+    {
+      "rango": "B3:B3",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B5:B6",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "F16:L32",
+      "tipo": "tabla_ecc"
+    }
+  ],
+  "N13 Partes relacionadas": [
+    {
+      "rango": "B3:B3",
+      "tipo": "num_notas"
+    },
+    {
+      "rango": "B5:B6",
+      "tipo": "texto_notas"
+    },
+    {
+      "rango": "E11:I18",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "E19:I27",
+      "tipo": "tabla_nota"
+    },
+    {
+      "rango": "E28:I34",
+      "tipo": "tabla_nota"
+    }
+  ]
+}

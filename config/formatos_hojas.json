@@ -1,0 +1,109 @@
+
+{
+  "tipos": {
+    "alcomite_informeaud": {
+      "style": "alcomite_informeaud"
+    },
+    "abc_notas": {
+      "style": "abc_notas"
+    },
+    "circulo_notas": {
+      "style": "circulo_notas"
+    },
+    "firmainformeaud": {
+      "style": "firmainformeaud"
+    },
+    "negritainformeaud": {
+      "style": "negritainformeaud"
+    },
+    "negritaycursiva_notas": {
+      "style": "abcnegritaycursiva_nota3"
+    },
+    "num_notas": {
+      "style": "num_notas"
+    },
+    "rayas_notas": {
+      "style": "rayas_notas"
+    },
+    "romanos_notas": {
+      "style": "romanos_notas"
+    },
+    "sangria_notas": {
+      "style": "sangria_notas"
+    },
+    "subtitulo_estynot": {
+      "style": "subtitulo_estynot"
+    },
+    "subrayado_notas": {
+      "style": "subrayado_notas"
+    },
+    "subtitulo_portada": {
+      "style": "subtitulo_portada"
+    },
+    "subtitulo_tablacontenido": {
+      "style": "subtitulo_tablacontenido"
+    },
+    "texto_notas": {
+      "style": "texto_notas"
+    },
+    "textoinformeaud": {
+      "style": "textoinformeaud"
+    },
+    "titulo_fidyinf": {
+      "style": "titulo_fidyinf"
+    },
+    "titulo_inf" : {
+      "style": "titulo_inf"
+    },
+    "titulo_general": {
+      "style": "titulo_general"
+    },
+    "titulo_portada": {
+      "style": "titulo_portada"
+    },
+    "viñetasinformeaud": {
+      "style": "viñetasinformeaud"
+    },
+    "espacio_notas": {
+      "style": "espacio_notas"
+    },
+    "tabla_contenido": {
+      "table_model_id": "[[MODELO_CONTENIDO]]",
+      "header_rows": 1
+    },
+    "tabla_bg": {
+      "table_model_id": "[[MODELO_BG]]",
+      "header_rows": 1
+    },
+    "tabla_er": {
+      "table_model_id": "[[MODELO_ER]]",
+      "header_rows": 1
+    },
+    "tabla_ecc": {
+      "table_model_id": "[[MODELO_ECC]]",
+      "header_rows": 1,
+      "orientation": "landscape",
+      "skip_excel_headers": false,
+      "trim_leading_empty_rows": true
+
+    },
+    "tabla_cf": {
+      "table_model_id": "[[MODELO_CF]]",
+      "header_rows": 1
+    },
+    "tabla_nota": {
+      "table_model_id": "[[MODELO_GENERICO_NOTAS]]",
+      "header_rows": 1
+    },
+    "tabla_nota1": {
+      "table_model_id": "[[MODELO_NOTA1]]",
+      "header_rows": 1,
+      "number_format": "percentage"
+    },
+    "tabla_vencimientos": {
+      "table_model_id": "[[MODELO_VENCIMIENTOS]]",
+      "header_rows": 1
+    }
+  }
+}
+
