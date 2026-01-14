@@ -25,7 +25,7 @@ from docx.document import Document as DocumentType
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.shared import Cm
 
-from procesador_bloques import procesar_bloque_por_tipo
+from scripts.procesador_bloques import procesar_bloque_por_tipo
 
 
 # ------------------------

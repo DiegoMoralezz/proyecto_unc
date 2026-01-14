@@ -22,13 +22,13 @@ PLANTILLA_PATH = "plantilla/plantilla_base_final.docx"
 # --- 2. GESTIÓN DE IMPORTS INTERNOS ---
 # Se elimina la manipulación de sys.path. Al ejecutar `streamlit run app.py`
 # desde la raíz, Python maneja los módulos en `scripts/` correctamente.
-from core_secciones import (
+from scripts.core_secciones import (
     cargar_rangos,
     cargar_formatos,
     extraer_seccion_desde_hoja,
     generar_docx_final_en_memoria,
 )
-from extractor_inteligente import extraer_bloques_desde_hoja
+from scripts.extractor_inteligente import extraer_bloques_desde_hoja
 
 
 # --- 3. LÓGICA DE NEGOCIO CENTRALIZADA ---
