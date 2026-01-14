@@ -166,77 +166,7 @@ with col1:
 
 
 
-    uploaded_file = st.file_uploader(
-
-
-
-
-        "Sube tu archivo UNC en Excel", 
-
-
-
-
-        type=["xlsx", "xlsm"],
-
-
-
-
-        help="Sube el archivo Excel para procesar. Se analizarán las hojas y sus contenidos para generar el dictamen.",
-
-
-
-
-        key="file_uploader" # Added key for better Streamlit management if needed
-
-
-
-
-    )
-
-
-
-
-
-
-
-
-
-        if uploaded_file is not None and st.session_state.workbook is None:
-
-
-
-
-
-
-
-
-
-            with st.spinner("Analizando archivo Excel..."):
-
-
-
-
-
-
-
-
-
-                # Se carga el workbook directamente desde el buffer del archivo subido
-
-
-
-
-
-
-
-
-
-                st.session_state.workbook = load_workbook(io.BytesIO(uploaded_file.getvalue()), data_only=True)
-
-
-
-
-
+        uploaded_file = st.file_uploader(
 
 
 
@@ -246,7 +176,112 @@ with col1:
 
 
 
+            "Sube tu archivo UNC en Excel", 
 
+
+
+
+    
+
+
+
+
+            type=["xlsx", "xlsm"],
+
+
+
+
+    
+
+
+
+
+            help="Sube el archivo Excel para procesar. Se analizarán las hojas y sus contenidos para generar el dictamen.",
+
+
+
+
+    
+
+
+
+
+            key="file_uploader" # Added key for better Streamlit management if needed
+
+
+
+
+    
+
+
+
+
+        )
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+        if uploaded_file is not None and st.session_state.workbook is None:
+
+
+
+
+    
+
+
+
+
+            with st.spinner("Analizando archivo Excel..."):
+
+
+
+
+    
+
+
+
+
+                # Se carga el workbook directamente desde el buffer del archivo subido
+
+
+
+
+    
+
+
+
+
+                st.session_state.workbook = load_workbook(io.BytesIO(uploaded_file.getvalue()), data_only=True)
+
+
+
+
+    
+
+
+
+
+    
+
+
+
+
+    
 
 
 
@@ -256,7 +291,7 @@ with col1:
 
 
 
-
+    
 
 
 
@@ -266,7 +301,7 @@ with col1:
 
 
 
-
+    
 
 
 
@@ -276,7 +311,7 @@ with col1:
 
 
 
-
+    
 
 
 
@@ -286,7 +321,7 @@ with col1:
 
 
 
-
+    
 
 
 
@@ -296,7 +331,7 @@ with col1:
 
 
 
-
+    
 
 
 
