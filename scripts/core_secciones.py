@@ -15,7 +15,7 @@ o por scripts de línea de comandos.
 import io
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Tuple, Union
 
 import pandas as pd
 from openpyxl import load_workbook
@@ -32,7 +32,7 @@ from scripts.procesador_bloques import procesar_bloque_por_tipo
 # Carga de datos / config
 # ------------------------
 
-def cargar_rangos(config_path: Path) -> Dict[str, List[Dict[str, str]]]:
+def cargar_rangos(config_path: Union[str, Path]) -> Dict[str, List[Dict[str, str]]]:
     """
     Carga el archivo JSON de rangos de hojas.
 
@@ -43,6 +43,9 @@ def cargar_rangos(config_path: Path) -> Dict[str, List[Dict[str, str]]]:
           ...
         }
     """
+    # Normalize path to a Path object
+    if isinstance(config_path, str):
+        config_path = Path(config_path)
     if not config_path.exists():
         raise FileNotFoundError(f"No se encontró el archivo de rangos: {config_path}")
 
@@ -101,7 +104,7 @@ def cargar_workbook(excel_path: Path) -> Workbook:
     return load_workbook(excel_path, data_only=True)
 
 
-def cargar_formatos(formatos_path: Path) -> Dict[str, Any]:
+def cargar_formatos(formatos_path: Union[str, Path]) -> Dict[str, Any]:
     """
     Carga el archivo JSON de formatos de hojas.
 
@@ -111,6 +114,9 @@ def cargar_formatos(formatos_path: Path) -> Dict[str, Any]:
           "perfiles": { "estado_financiero": { ... }, ... }
         }
     """
+    # Normalize path to a Path object
+    if isinstance(formatos_path, str):
+        formatos_path = Path(formatos_path)
     if not formatos_path.exists():
         raise FileNotFoundError(f"No se encontró el archivo de formatos: {formatos_path}")
 
