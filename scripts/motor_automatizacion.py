@@ -14,9 +14,9 @@ from openpyxl import load_workbook
 # --- 1. ÚNICA FUENTE DE VERDAD PARA RUTAS ---
 # Se definen rutas relativas desde la raíz del proyecto. Streamlit Cloud
 # ejecuta la app desde la raíz del repo, por lo que estas rutas son portables.
-CONFIG_PATH = "config/rangos_hojas.json"
-FORMATOS_PATH = "config/formatos_hojas.json"
-PLANTILLA_PATH = "plantilla/plantilla_base_final.docx"
+CONFIG_PATH = Path("config/rangos_hojas.json")
+FORMATOS_PATH = Path("config/formatos_hojas.json")
+PLANTILLA_PATH = Path("plantilla/plantilla_base_final.docx")
 
 
 # --- 2. GESTIÓN DE IMPORTS INTERNOS ---
