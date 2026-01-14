@@ -1,6 +1,4 @@
-from pathlib import Path
-import sys
-import tempfile
+import io
 
 import streamlit as st
 from openpyxl import load_workbook, Workbook
@@ -213,52 +211,12 @@ with col1:
 
 
 
-            # --- Solución Permanente para Carga de Archivo ---
+                        # Se carga el workbook directamente desde el buffer del archivo subido
 
 
 
 
-            # Se usa un archivo temporal seguro para que openpyxl pueda leerlo
-
-
-
-
-            # desde una ruta, asegurando la correcta lectura de estilos y metadatos.
-
-
-
-
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-
-
-
-
-                tmp.write(uploaded_file.getbuffer())
-
-
-
-
-                temp_path = tmp.name
-
-
-
-
-            
-
-
-
-
-            # Se carga el workbook desde la ruta temporal segura
-
-
-
-
-            st.session_state.workbook = load_workbook(temp_path, data_only=True)
-
-
-
-
-            # --- Fin Solución Permanente ---
+                        st.session_state.workbook = load_workbook(io.BytesIO(uploaded_file.getvalue()), data_only=True)
 
 
 
