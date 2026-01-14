@@ -5,18 +5,18 @@ import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-# --- IMPORTS MÍNIMOS GLOBALES ---
-# Solo se importa lo absolutamente necesario para que la ventana de Tkinter arranque.
+# --- IMPORTS DE UI ---
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
 
-# --- DEFINICIONES GLOBALES ---
-BASE_DIR = Path(__file__).resolve().parent
-# Se añade la carpeta de scripts al path para permitir importaciones locales
-if str(BASE_DIR / "scripts") not in sys.path:
-    sys.path.append(str(BASE_DIR / "scripts"))
-
-CONFIG_PATH = BASE_DIR / "config" / "rangos_hojas.json"
-FORMATOS_PATH = BASE_DIR / "config" / "formatos_hojas.json"
-PLANTILLA_PATH = BASE_DIR / "plantilla" / "plantilla_base_final.docx"
+# --- IMPORTS DEL MOTOR DE AUTOMATIZACIÓN ---
+# El motor es ahora la fuente de verdad para la lógica y las rutas.
+from scripts.motor_automatizacion import (
+    load_project_ranges,
+    load_project_formats,
+    discover_and_load_blocks,
+    PLANTILLA_PATH,
+)
 
 
 class DictamenDesktopApp:
@@ -34,8 +34,8 @@ class DictamenDesktopApp:
         # --- Dependencias que se cargarán bajo demanda ---
         self.pd = None
         self.Workbook = None
-        self.core_secciones = None
-        self.extractor_inteligente = None
+        self.core_secciones = None  # Se mantiene por ahora para funciones de generación
+        self.extractor_inteligente = None # Será eliminado eventualmente
 
         try:
             style = ttk.Style()
@@ -60,24 +60,21 @@ class DictamenDesktopApp:
         self.hojas_disponibles: list[str] = []
         self.orden_hojas: list[str] = []
 
-        # --- Carga de configuraciones iniciales (diferida y segura) ---
+        # --- Carga de configuraciones iniciales (usando el motor) ---
         self._load_initial_configs()
 
         # --- Construir la UI ---
         self._build_ui()
 
     def _load_initial_configs(self):
-        """Carga las configuraciones JSON de forma segura."""
+        """Carga las configuraciones JSON de forma segura usando el motor."""
         try:
-            from core_secciones import cargar_rangos, cargar_formatos
-            self.rangos_estaticos = cargar_rangos(CONFIG_PATH)
-            self.formatos = cargar_formatos(FORMATOS_PATH)
-        except FileNotFoundError as e:
-            self.formatos = None
-            messagebox.showwarning("Archivo no encontrado", f"No se encontró un archivo de configuración esencial: {e.filename}")
+            self.rangos_estaticos = load_project_ranges()
+            self.formatos = load_project_formats()
         except Exception as e:
             self.formatos = None
             messagebox.showerror("Error de Configuración", f"No se pudieron cargar los archivos de configuración: {e}")
+
 
         # Calcular los tipos disponibles para la UI
         default_tipos = {
@@ -96,29 +93,16 @@ class DictamenDesktopApp:
 
     def _discover_and_load_blocks(self) -> dict:
         """
-        Analiza todas las hojas de un libro de Excel y carga los bloques de contenido
-        usando el método híbrido.
+        Llama al motor central para analizar las hojas del libro de Excel y cargar
+        los bloques de contenido.
         """
-        # --- Importación diferida ---
-        if self.extractor_inteligente is None:
-            from scripts.extractor_inteligente import extraer_bloques_desde_hoja
-            self.extractor_inteligente = extraer_bloques_desde_hoja
-        
         if not self.workbook:
             return {}
-
-        rangos_descubiertos = {}
-        for sheet_name in self.workbook.sheetnames:
-            sheet_object = self.workbook[sheet_name]
-            formatos_config = self.formatos if self.formatos else {}
-            bloques_automaticos = self.extractor_inteligente(sheet_object, formatos_config)
-            
-            if bloques_automaticos:
-                rangos_descubiertos[sheet_name] = bloques_automaticos
-            elif sheet_name in self.rangos_estaticos:
-                rangos_descubiertos[sheet_name] = self.rangos_estaticos[sheet_name]
-
-        return rangos_descubiertos
+        
+        # Llama a la función centralizada desde el motor
+        return discover_and_load_blocks(
+            self.workbook, self.rangos_estaticos, self.formatos
+        )
         
     def _build_ui(self) -> None:
         # ... (El código de construcción de UI se mantiene, referenciando self.métodos) ...

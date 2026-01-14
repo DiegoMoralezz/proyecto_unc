@@ -42,7 +42,7 @@ def extraer_bloques_desde_hoja(ws, formatos_config):
     patron_codigo = re.compile(r'\[\[(.*?)\]\]')
 
     # 1. Primera pasada: Recolectar todos los códigos y sus posiciones.
-    for fila in ws.iter_rows():
+    for fila in ws.iter_rows(min_row=ws.min_row, max_row=ws.max_row, min_col=ws.min_column, max_col=ws.max_column):
         for celda in fila:
             if isinstance(celda.value, str):
                 match = patron_codigo.search(celda.value)
