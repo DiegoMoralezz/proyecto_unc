@@ -201,22 +201,7 @@ with col1:
 
 
 
-    if uploaded_file is not None and st.session_state.workbook is None:
-
-
-
-
-        with st.spinner("Analizando archivo Excel..."):
-
-
-
-
-                        # Se carga el workbook directamente desde el buffer del archivo subido
-
-
-
-
-                        st.session_state.workbook = load_workbook(io.BytesIO(uploaded_file.getvalue()), data_only=True)
+        if uploaded_file is not None and st.session_state.workbook is None:
 
 
 
@@ -226,32 +211,97 @@ with col1:
 
 
 
-            st.session_state.file_name = uploaded_file.name
+            with st.spinner("Analizando archivo Excel..."):
 
 
 
 
-            st.session_state.rangos_dinamicos = discover_and_load_blocks(
 
 
 
 
-                st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
+
+                # Se carga el workbook directamente desde el buffer del archivo subido
 
 
 
 
-            )
 
 
 
 
-            st.session_state.buf_final = None # Clear previous buffer on new upload
+
+                st.session_state.workbook = load_workbook(io.BytesIO(uploaded_file.getvalue()), data_only=True)
 
 
 
 
-            st.success(f"Archivo '{st.session_state.file_name}' cargado y analizado.")
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+                st.session_state.file_name = uploaded_file.name
+
+
+
+
+
+
+
+
+
+                st.session_state.rangos_dinamicos = discover_and_load_blocks(
+
+
+
+
+
+
+
+
+
+                    st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
+
+
+
+
+
+
+
+
+
+                )
+
+
+
+
+
+
+
+
+
+                st.session_state.buf_final = None # Clear previous buffer on new upload
+
+
+
+
+
+
+
+
+
+                st.success(f"Archivo '{st.session_state.file_name}' cargado y analizado.")
 
 
 
