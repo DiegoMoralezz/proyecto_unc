@@ -41,36 +41,46 @@ def extraer_bloques_desde_hoja(ws, formatos_config):
     
     patron_codigo = re.compile(r'\[\[(.*?)\]\]')
 
-    # 1. Primera pasada: Recolectar todos los códigos y sus posiciones.
-    for fila in ws.iter_rows(min_row=ws.min_row, max_row=ws.max_row, min_col=ws.min_column, max_col=ws.max_column):
-        for celda in fila:
-            if isinstance(celda.value, str):
-                match = patron_codigo.search(celda.value)
-                if match:
-                    codigo_completo = match.group(1).strip()
-                    
-                    if codigo_completo.startswith('inicio_'):
-                        id_tabla = codigo_completo.replace('inicio_', '')
-                        # Añadir la posición a la lista de este ID
-                        pos_inicio_tablas[id_tabla].append((celda.row, celda.column + 1))
-                    
-                    elif codigo_completo.startswith('fin_'):
-                        id_tabla = codigo_completo.replace('fin_', '')
-                        # Añadir la posición a la lista de este ID
-                        pos_fin_tablas[id_tabla].append((celda.row, celda.column - 1))
+    # Antes de iterar, verificar si la hoja tiene alguna dimensión.
+    # Si no tiene max_row o max_column, es probable que esté vacía.
+    if not ws.max_row or not ws.max_column:
+        return []
 
-                    else:
-                        id_simple = codigo_completo
-                        if id_simple in formatos_config.get('tipos', {}):
-                            contenido_celda = ws.cell(row=celda.row, column=celda.column + 1).value
-                            # Añadir el bloque simple con su fila para ordenarlo después
-                            bloques_con_posicion.append({
-                                'tipo': id_simple,
-                                'contenido': contenido_celda or "",
-                                'fila': celda.row
-                            })
+    # Se vuelve a `iter_rows` por rendimiento, pero con un manejo de errores
+    # más robusto para capturar el `KeyError` si ocurre.
+    try:
+        for fila in ws.iter_rows():
+            for celda in fila:
+                if isinstance(celda.value, str):
+                    match = patron_codigo.search(celda.value)
+                    if match:
+                        codigo_completo = match.group(1).strip()
+                        
+                        if codigo_completo.startswith('inicio_'):
+                            id_tabla = codigo_completo.replace('inicio_', '')
+                            pos_inicio_tablas[id_tabla].append((celda.row, celda.column + 1))
+                        
+                        elif codigo_completo.startswith('fin_'):
+                            id_tabla = codigo_completo.replace('fin_', '')
+                            pos_fin_tablas[id_tabla].append((celda.row, celda.column - 1))
+
                         else:
-                            pass
+                            id_simple = codigo_completo
+                            if id_simple in formatos_config.get('tipos', {}):
+                                # El contenido está en la celda de al lado
+                                contenido_celda = ws.cell(row=celda.row, column=celda.column + 1).value
+                                bloques_con_posicion.append({
+                                    'tipo': id_simple,
+                                    'contenido': contenido_celda or "",
+                                    'fila': celda.row
+                                })
+    except KeyError as e:
+        print(f"Advertencia: Ocurrió un error de clave al procesar la hoja '{ws.title}'. "
+              f"Esto puede suceder con hojas anómalas. La hoja será omitida. Error: {e}")
+        return []
+    except Exception as e:
+        print(f"Error inesperado procesando la hoja '{ws.title}': {e}")
+        return []
 
     # 2. Consolidar las tablas en la lista de bloques
     for id_tabla, inicios in pos_inicio_tablas.items():

@@ -1,5 +1,5 @@
-import io
-
+from pathlib import Path
+import tempfile
 import streamlit as st
 from openpyxl import load_workbook, Workbook
 
@@ -22,7 +22,7 @@ FORMATOS = load_project_formats()
 # Orden definido (alineado con unir_documentos.py)
 ORDER = [
     "Portada",
-    "contenido",
+    "Contenido",
     "Dictamen 1",
     "Dictamen 2",
     "BG",
@@ -121,7 +121,47 @@ if 'rangos_dinamicos' not in st.session_state:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 st.title("Generador de Dictamen UNC")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -136,7 +176,37 @@ st.title("Generador de Dictamen UNC")
 
 
 
-col1, col2 = st.columns([1, 2]) # Columna izquierda más pequeña
+
+
+
+
+
+
+
+
+
+
+col1, col2 = st.columns([1, 2])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -151,7 +221,27 @@ col1, col2 = st.columns([1, 2]) # Columna izquierda más pequeña
 
 
 
+
+
+
+
+
+
+
+
+
+
 with col1:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -161,182 +251,412 @@ with col1:
 
 
 
-    
 
 
 
 
-        uploaded_file = st.file_uploader(
 
 
 
 
-    
 
 
 
 
-            "Sube tu archivo UNC en Excel", 
 
 
 
 
-    
 
 
 
 
-            type=["xlsx", "xlsm"],
 
 
 
 
-    
 
+    uploaded_file = st.file_uploader(
 
 
 
-            help="Sube el archivo Excel para procesar. Se analizarán las hojas y sus contenidos para generar el dictamen.",
 
 
 
 
-    
 
 
 
 
-            key="file_uploader" # Added key for better Streamlit management if needed
 
 
 
+        "Sube tu archivo UNC en Excel",
 
-    
 
 
 
 
-        )
 
 
 
 
-    
 
 
 
 
-    
 
+        type=["xlsx", "xlsm"],
 
 
 
-    
 
 
 
 
-        if uploaded_file is not None and st.session_state.workbook is None:
 
 
 
 
-    
 
 
 
+        help="Sube el archivo Excel para procesar. Se analizarán las hojas y sus contenidos para generar el dictamen.",
 
-            with st.spinner("Analizando archivo Excel..."):
 
 
 
 
-    
 
 
 
 
-                # Se carga el workbook directamente desde el buffer del archivo subido
 
 
 
 
-    
 
+        key="file_uploader"
 
 
 
-                st.session_state.workbook = load_workbook(io.BytesIO(uploaded_file.getvalue()), data_only=True)
 
 
 
 
-    
 
 
 
 
-    
 
 
 
+    )
 
-    
 
 
 
 
-                st.session_state.file_name = uploaded_file.name
 
 
 
 
-    
 
 
 
 
-                st.session_state.rangos_dinamicos = discover_and_load_blocks(
 
 
 
 
-    
 
 
 
 
-                    st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
 
 
 
 
-    
 
 
 
 
-                )
+    # El análisis se activa aquí, dentro de la columna de controles
 
 
 
 
-    
 
 
 
 
-                st.session_state.buf_final = None # Clear previous buffer on new upload
 
 
 
 
-    
 
 
+    if uploaded_file is not None and st.session_state.workbook is None:
 
 
-                st.success(f"Archivo '{st.session_state.file_name}' cargado y analizado.")
+
+
+
+
+
+
+
+
+
+
+
+
+        with st.spinner("Analizando archivo Excel..."):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            # Se revierte a la solución con archivo temporal, que es más robusta para openpyxl
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                tmp.write(uploaded_file.getvalue())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                temp_path = tmp.name
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            # Se carga el workbook desde la ruta temporal segura
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            st.session_state.workbook = load_workbook(temp_path, data_only=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            st.session_state.file_name = uploaded_file.name
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            st.session_state.rangos_dinamicos = discover_and_load_blocks(
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            st.session_state.buf_final = None  # Limpiar buffer anterior
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            st.success(f"Archivo '{st.session_state.file_name}' cargado y analizado.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # Los controles de generación solo aparecen si el archivo ya fue procesado
+
+
+
+
+
 
 
 
@@ -351,12 +671,52 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
         st.markdown("---")
 
 
 
 
-        st.subheader("2. Generar y Descargar")
+
+
+
+
+
+
+
+
+
+
+        st.header("2. Generar y Descargar")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -371,7 +731,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
             with st.spinner("Generando documento final... Por favor espera."):
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -381,7 +761,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
                     st.session_state.workbook,
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -391,7 +791,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
                     PLANTILLA_PATH,
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -401,12 +821,42 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
                     formatos=FORMATOS,
 
 
 
 
+
+
+
+
+
+
+
+
+
+
                 )
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -421,7 +871,22 @@ with col1:
 
 
 
-        # Botón de descarga persistente, ahora en la columna izquierda
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -431,7 +896,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
             st.download_button(
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -441,7 +926,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
                 data=st.session_state.buf_final,
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -451,7 +956,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
                 mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -461,7 +986,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
                 key="download_button"
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -471,7 +1016,27 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
         else:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -486,7 +1051,37 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         st.markdown("---")
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -496,12 +1091,57 @@ with col1:
 
 
 
-            for key in st.session_state.keys():
+
+
+
+
+
+
+
+
+
+
+            # Limpiar todo el estado de la sesión para un reinicio limpio
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            for key in list(st.session_state.keys()):
+
+
+
+
+
+
+
+
+
+
 
 
 
 
                 del st.session_state[key]
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -521,12 +1161,77 @@ with col1:
 
 
 
+    else:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        st.info("Sube un archivo para activar los controles.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # --- COLUMNA DERECHA: PREVISUALIZACIÓN Y RESULTADOS ---
 
 
 
 
+
+
+
+
+
+
+
+
+
+
 with col2:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -541,7 +1246,37 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     if st.session_state.workbook is None:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -556,7 +1291,37 @@ with col2:
 
 
 
-    if st.session_state.rangos_dinamicos:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    elif st.session_state.rangos_dinamicos:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -566,17 +1331,42 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
         
 
 
 
 
-        # Usar un expander para la previsualización
 
 
 
 
-        with st.expander("Ver Previsualización de Secciones", expanded=True): # Expanded by default
+
+
+
+
+
+
+        with st.expander("Ver Previsualización de Secciones", expanded=True):
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -586,7 +1376,27 @@ with col2:
 
 
 
-                "Selecciona una sección/hoja para previsualizar su contenido:", 
+
+
+
+
+
+
+
+
+
+
+                "Selecciona una sección/hoja para previsualizar:",
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -596,7 +1406,27 @@ with col2:
 
 
 
-                help="Permite ver el contenido detectado en cada sección antes de generar el documento final."
+
+
+
+
+
+
+
+
+
+
+                help="Permite ver el contenido detectado en cada sección."
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -611,7 +1441,37 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             if hoja_sel:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -621,7 +1481,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                 if not bloques:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -631,7 +1511,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                 else:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -641,7 +1541,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                     for i, bloque in enumerate(bloques, 1):
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -651,7 +1571,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                         if isinstance(bloque.get('contenido'), pd.DataFrame):
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -661,7 +1601,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                         else:
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -671,7 +1631,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                                 f"Contenido del Bloque {i}",
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -681,7 +1661,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                                 height=100,
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -691,7 +1691,27 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                             )
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -701,7 +1721,42 @@ with col2:
 
 
 
+
+
+
+
+
+
+
+
+
+
                 st.info("Selecciona una hoja para ver su previsualización.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -711,7 +1766,6 @@ with col2:
 
 
 
-         st.warning("No se encontraron secciones o bloques de contenido en el archivo.")
 
 
 
@@ -722,4 +1776,4 @@ with col2:
 
 
 
-
+        st.warning("El archivo fue cargado, pero no se encontraron secciones o bloques de contenido con los criterios actuales.")

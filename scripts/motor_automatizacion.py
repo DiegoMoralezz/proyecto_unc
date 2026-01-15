@@ -49,13 +49,11 @@ def discover_and_load_blocks(wb: Workbook, rangos_manuales: dict, formatos_confi
     """
     Analiza todas las hojas de un libro de Excel y carga los bloques de contenido
     usando el método híbrido: automático primero, manual como fallback.
-    Esta función es agnóstica a la UI (no contiene st.info ni messagebox).
     """
     rangos_descubiertos = {}
     for sheet_name in wb.sheetnames:
         sheet_object = wb[sheet_name]
         
-        # Asegurar que formatos_config no es None para el extractor
         if not formatos_config:
             formatos_config = {}
 
@@ -63,11 +61,23 @@ def discover_and_load_blocks(wb: Workbook, rangos_manuales: dict, formatos_confi
         bloques_automaticos = extraer_bloques_desde_hoja(sheet_object, formatos_config)
         
         if bloques_automaticos:
-            # Usar los bloques descubiertos automáticamente
             rangos_descubiertos[sheet_name] = bloques_automaticos
         elif sheet_name in rangos_manuales:
-            # 2. Fallback: usar la configuración manual si existe para esa hoja
-            rangos_descubiertos[sheet_name] = rangos_manuales[sheet_name]
+            # 2. Fallback: usar la configuración manual
+            parrafos, tablas = extraer_seccion_desde_hoja(wb[sheet_name], rangos_manuales[sheet_name])
+            
+            bloques = []
+            if parrafos:
+                for p in parrafos:
+                    bloques.append({'tipo': 'texto', 'contenido': p})
+            if tablas:
+                for t in tablas:
+                    bloques.append({'tipo': 'tabla', 'contenido': t})
+            
+            if bloques:
+                rangos_descubiertos[sheet_name] = bloques
+        else:
+            pass
 
     return rangos_descubiertos
 
