@@ -96,6 +96,26 @@ if 'rangos_dinamicos' not in st.session_state:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     st.session_state.rangos_dinamicos = None
 
 
@@ -111,7 +131,162 @@ if 'rangos_dinamicos' not in st.session_state:
 
 
 
-# ===================== INTERFAZ STREAMLIT ===================== #
+
+
+
+
+
+# ===================== LÓGICA REACTIVA CENTRAL (INPUT Y PROCESAMIENTO) =====================
+
+
+
+
+
+
+
+
+
+# 1. Input principal: Carga de archivo
+
+
+
+
+# Se mueve al nivel raíz para asegurar que se ejecute antes del layout.
+
+
+
+
+uploaded_file = st.file_uploader(
+
+
+
+
+    "Sube tu archivo UNC en Excel",
+
+
+
+
+    type=["xlsx", "xlsm"],
+
+
+
+
+    help="Sube el archivo Excel para procesar. Se analizarán las hojas y sus contenidos para generar el dictamen.",
+
+
+
+
+    key="file_uploader"
+
+
+
+
+)
+
+
+
+
+
+
+
+
+
+# 2. Procesamiento del archivo
+
+
+
+
+# Esta lógica ahora se ejecuta a nivel raíz, garantizando que el estado se
+
+
+
+
+# actualice de forma atómica antes de renderizar la UI.
+
+
+
+
+if uploaded_file is not None and st.session_state.workbook is None:
+
+
+
+
+    with st.spinner("Analizando archivo Excel..."):
+
+
+
+
+        # Uso de archivo temporal para compatibilidad con openpyxl
+
+
+
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+
+
+
+
+            tmp.write(uploaded_file.getvalue())
+
+
+
+
+            temp_path = tmp.name
+
+
+
+
+        
+
+
+
+
+        # Carga del workbook y descubrimiento de bloques
+
+
+
+
+        st.session_state.workbook = load_workbook(temp_path, data_only=True)
+
+
+
+
+        st.session_state.file_name = uploaded_file.name
+
+
+
+
+        st.session_state.rangos_dinamicos = discover_and_load_blocks(
+
+
+
+
+            st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
+
+
+
+
+        )
+
+
+
+
+        st.session_state.buf_final = None  # Limpiar buffer en cada nueva carga
+
+
+
+
+        st.success(f"Archivo '{st.session_state.file_name}' cargado y analizado.")
+
+
+
+
+        # Se recomienda un rerun para asegurar que la UI se actualice con el nuevo estado
+
+
+
+
+        st.rerun()
 
 
 
@@ -126,12 +301,7 @@ if 'rangos_dinamicos' not in st.session_state:
 
 
 
-
-
-
-
-
-
+# ===================== INTERFAZ STREAMLIT (RENDERIZADO) =====================
 
 
 
@@ -151,62 +321,12 @@ st.title("Generador de Dictamen UNC")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # --- Layout de dos columnas ---
 
 
 
 
-
-
-
-
-
-
-
-
-
-
 col1, col2 = st.columns([1, 2])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -226,11 +346,6 @@ col1, col2 = st.columns([1, 2])
 
 
 
-
-
-
-
-
 with col1:
 
 
@@ -241,422 +356,17 @@ with col1:
 
 
 
+    # El header de carga ya no es necesario aquí, el uploader es global.
 
 
 
 
 
-    st.header("1. Carga y Generación")
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    uploaded_file = st.file_uploader(
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        "Sube tu archivo UNC en Excel",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        type=["xlsx", "xlsm"],
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        help="Sube el archivo Excel para procesar. Se analizarán las hojas y sus contenidos para generar el dictamen.",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        key="file_uploader"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # El análisis se activa aquí, dentro de la columna de controles
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    if uploaded_file is not None and st.session_state.workbook is None:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        with st.spinner("Analizando archivo Excel..."):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            # Se revierte a la solución con archivo temporal, que es más robusta para openpyxl
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                tmp.write(uploaded_file.getvalue())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                temp_path = tmp.name
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            # Se carga el workbook desde la ruta temporal segura
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            st.session_state.workbook = load_workbook(temp_path, data_only=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            st.session_state.file_name = uploaded_file.name
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            st.session_state.rangos_dinamicos = discover_and_load_blocks(
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            st.session_state.buf_final = None  # Limpiar buffer anterior
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            st.success(f"Archivo '{st.session_state.file_name}' cargado y analizado.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Los controles de generación solo aparecen si el archivo ya fue procesado
-
-
-
-
-
+    # Esta columna ahora solo muestra los controles de acción post-análisis.
 
 
 
@@ -676,47 +386,7 @@ with col1:
 
 
 
-
-
-
-
-
-        st.markdown("---")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         st.header("2. Generar y Descargar")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -731,27 +401,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
             with st.spinner("Generando documento final... Por favor espera."):
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -761,27 +411,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
                     st.session_state.workbook,
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -791,27 +421,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
                     PLANTILLA_PATH,
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -821,42 +431,12 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
                     formatos=FORMATOS,
 
 
 
 
-
-
-
-
-
-
-
-
-
-
                 )
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -871,37 +451,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         if st.session_state.buf_final:
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -911,27 +461,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
                 label="Descargar DICTAMEN_FINAL.docx",
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -941,27 +471,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
                 file_name="DICTAMEN_FINAL.docx",
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -971,27 +481,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
                 help="Haz clic para descargar el documento Word generado.",
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1001,42 +491,12 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
             )
 
 
 
 
-
-
-
-
-
-
-
-
-
-
         else:
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1051,37 +511,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         st.markdown("---")
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1091,27 +521,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
             # Limpiar todo el estado de la sesión para un reinicio limpio
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1121,27 +531,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
                 del st.session_state[key]
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1151,27 +541,7 @@ with col1:
 
 
 
-
-
-
-
-
-
-
-
-
-
     else:
-
-
-
-
-
-
-
-
-
-
 
 
 
