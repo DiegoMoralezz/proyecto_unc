@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 import sys
 from io import BytesIO
+import gc  # Importar el módulo de recolección de basura
 
 # Dependencias de procesamiento
 import pandas as pd
@@ -31,8 +32,20 @@ from scripts.core_secciones import (
 from scripts.extractor_inteligente import extraer_bloques_desde_hoja
 
 
-# --- 3. LÓGICA DE NEGOCIO CENTRALIZADA ---
-# Aquí moveremos las funciones comunes.
+# --- 3. CONSTANTES DE LÓGICA DE NEGOCIO ---
+# Orden definido de las secciones del documento.
+# Movido desde app.py para centralizar la lógica de negocio.
+ORDER = [
+    "Portada", "Contenido", "Dictamen 1", "Dictamen 2", "BG", "ER", "ECC", "CF",
+    "Nota 1 y 2", "Nota 1 tablas", "Nota 3", "N4 Efectivo", "Nota 5 Txt",
+    "N5 Inventarios Inm(Tablas)", "N6 Proveedores", "N7 Depósitos en garantía",
+    "N8 Préstamos", "N9 Otras Aportaciones Fid", "Nota 10 Impuestos",
+    "N11 Patrimonio", "N12 Vencimientos", "N13 Partes relacionadas",
+    "Nota 14", "Nota 15", "Nota 16",
+]
+
+
+# --- 4. LÓGICA DE NEGOCIO CENTRALIZADA ---
 
 def load_project_ranges() -> dict:
     """Carga los rangos de hojas desde el archivo de configuración."""
@@ -81,4 +94,34 @@ def discover_and_load_blocks(wb: Workbook, rangos_manuales: dict, formatos_confi
 
     return rangos_descubiertos
 
-# Aquí se añadirán más funciones como `generar_dictamen_final`
+def ejecutar_generacion_completa(
+    workbook_path: str, rangos_dinamicos: dict, formatos: dict | None
+) -> BytesIO:
+    """
+    Encapsula la generación del DOCX final, gestionando la memoria de forma explícita.
+    Esta función carga el workbook, genera el documento y luego lo libera.
+    """
+    wb = None
+    # Comentario: Se usa un bloque try...finally para garantizar que los objetos
+    # pesados (el workbook) se liberen explícitamente, reduciendo la acumulación
+    # de memoria en ejecuciones sucesivas de Streamlit.
+    try:
+        # Se vuelve a cargar el workbook aquí, pero su ciclo de vida está
+        # estrictamente limitado a esta función.
+        wb = load_workbook(workbook_path, data_only=True)
+
+        buf = generar_docx_final_en_memoria(
+            wb=wb,
+            rangos=rangos_dinamicos,
+            plantilla_path=PLANTILLA_PATH,
+            orden=ORDER,
+            formatos=formatos,
+        )
+        return buf
+    finally:
+        # Paso clave: Liberación explícita de memoria
+        if wb:
+            del wb
+            # Se fuerza una recolección de basura para limpiar la memoria de inmediato.
+            gc.collect()
+
