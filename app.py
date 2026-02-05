@@ -16,7 +16,7 @@ import pandas as pd
 
 
 # Cargar config de rangos y formatos una vez usando el motor
-RANGOS_ESTATICOS = load_project_ranges()
+RANGOS_ESTATICOS = {} # Ya no se carga rangos_hojas.json
 FORMATOS = load_project_formats()
 
 # Orden definido (alineado con unir_documentos.py)
@@ -261,12 +261,12 @@ if uploaded_file is not None and st.session_state.workbook is None:
 
 
 
-            st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
+                    st.session_state.workbook, RANGOS_ESTATICOS, FORMATOS
 
 
 
 
-        )
+                )
 
 
 
@@ -321,12 +321,37 @@ st.title("Generador de Dictamen UNC")
 
 
 
+
+
+
+
+
+
+
+
+
+
 # --- Layout de dos columnas ---
 
 
 
 
+
+
+
+
+
 col1, col2 = st.columns([1, 2])
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -346,27 +371,17 @@ col1, col2 = st.columns([1, 2])
 
 
 
+
+
+
+
+
+
+
+
+
+
 with col1:
-
-
-
-
-
-
-
-
-
-    # El header de carga ya no es necesario aquí, el uploader es global.
-
-
-
-
-
-
-
-
-
-    # Esta columna ahora solo muestra los controles de acción post-análisis.
 
 
 
@@ -396,7 +411,22 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
         if st.button("Generar DOCX final", type="primary", help="Crea el documento Word con el dictamen completo.", key="generate_button"):
+
+
+
+
+
 
 
 
@@ -406,7 +436,37 @@ with col1:
 
 
 
+
+
+
+
+
+                # El orden ahora se toma directamente de las hojas descubiertas
+
+
+
+
+
+
+
+
+
+                orden_dinamico = list(st.session_state.rangos_dinamicos.keys())
+
+
+
+
+
+
+
+
+
                 st.session_state.buf_final = generar_docx_final_en_memoria(
+
+
+
+
+
 
 
 
@@ -416,7 +476,17 @@ with col1:
 
 
 
+
+
+
+
+
                     st.session_state.rangos_dinamicos,
+
+
+
+
+
 
 
 
@@ -426,7 +496,17 @@ with col1:
 
 
 
-                    orden=ORDER,
+
+
+
+
+
+                    orden=orden_dinamico,
+
+
+
+
+
 
 
 
@@ -436,7 +516,17 @@ with col1:
 
 
 
+
+
+
+
+
                 )
+
+
+
+
+
 
 
 
@@ -451,7 +541,22 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
         if st.session_state.buf_final:
+
+
+
+
+
 
 
 
@@ -461,7 +566,17 @@ with col1:
 
 
 
+
+
+
+
+
                 label="Descargar DICTAMEN_FINAL.docx",
+
+
+
+
+
 
 
 
@@ -471,7 +586,17 @@ with col1:
 
 
 
+
+
+
+
+
                 file_name="DICTAMEN_FINAL.docx",
+
+
+
+
+
 
 
 
@@ -481,7 +606,17 @@ with col1:
 
 
 
+
+
+
+
+
                 help="Haz clic para descargar el documento Word generado.",
+
+
+
+
+
 
 
 
@@ -491,12 +626,27 @@ with col1:
 
 
 
+
+
+
+
+
             )
 
 
 
 
+
+
+
+
+
         else:
+
+
+
+
+
 
 
 
@@ -511,7 +661,22 @@ with col1:
 
 
 
+
+
+
+
+
+
+
+
+
+
         st.markdown("---")
+
+
+
+
+
 
 
 
@@ -521,7 +686,7 @@ with col1:
 
 
 
-            # Limpiar todo el estado de la sesión para un reinicio limpio
+
 
 
 
@@ -531,7 +696,17 @@ with col1:
 
 
 
+
+
+
+
+
                 del st.session_state[key]
+
+
+
+
+
 
 
 
@@ -541,22 +716,22 @@ with col1:
 
 
 
+
+
+
+
+
     else:
 
 
 
 
+
+
+
+
+
         st.info("Sube un archivo para activar los controles.")
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -591,12 +766,12 @@ with col1:
 
 
 
+
+
+
+
+
 with col2:
-
-
-
-
-
 
 
 
@@ -626,22 +801,7 @@ with col2:
 
 
 
-
-
-
-
-
-
-
-
-
-
     if st.session_state.workbook is None:
-
-
-
-
-
 
 
 
@@ -671,16 +831,6 @@ with col2:
 
 
 
-
-
-
-
-
-
-
-
-
-
     elif st.session_state.rangos_dinamicos:
 
 
@@ -691,17 +841,27 @@ with col2:
 
 
 
+        # La lista de hojas disponibles ahora se toma directamente de las claves
 
 
 
 
 
-        hojas_disponibles = [s for s in ORDER if s in st.session_state.rangos_dinamicos]
+
+
+
+
+        # del diccionario de rangos, respetando el orden del Excel.
 
 
 
 
 
+
+
+
+
+        hojas_disponibles = list(st.session_state.rangos_dinamicos.keys())
 
 
 
@@ -721,16 +881,17 @@ with col2:
 
 
 
+        if not hojas_disponibles:
 
 
 
 
 
-        with st.expander("Ver Previsualización de Secciones", expanded=True):
 
 
 
 
+            st.warning("El archivo fue cargado, pero no se encontraron secciones o bloques de contenido con los criterios actuales.")
 
 
 
@@ -740,8 +901,8 @@ with col2:
 
 
 
+        else:
 
-            hoja_sel = st.selectbox(
 
 
 
@@ -750,16 +911,17 @@ with col2:
 
 
 
+            with st.expander("Ver Previsualización de Secciones", expanded=True):
 
 
 
 
 
 
-                "Selecciona una sección/hoja para previsualizar:",
 
 
 
+                hoja_sel = st.selectbox(
 
 
 
@@ -769,9 +931,9 @@ with col2:
 
 
 
+                    "Selecciona una sección/hoja para previsualizar:",
 
 
-                hojas_disponibles,
 
 
 
@@ -779,6 +941,7 @@ with col2:
 
 
 
+                    hojas_disponibles,
 
 
 
@@ -786,9 +949,9 @@ with col2:
 
 
 
-                help="Permite ver el contenido detectado en cada sección."
 
 
+                    help="Permite ver el contenido detectado en cada sección."
 
 
 
@@ -798,10 +961,10 @@ with col2:
 
 
 
+                )
 
 
 
-            )
 
 
 
@@ -818,6 +981,7 @@ with col2:
 
 
 
+                if hoja_sel:
 
 
 
@@ -827,16 +991,17 @@ with col2:
 
 
 
+                    bloques = st.session_state.rangos_dinamicos.get(hoja_sel, [])
 
 
 
 
-            if hoja_sel:
 
 
 
 
 
+                    if not bloques:
 
 
 
@@ -846,7 +1011,7 @@ with col2:
 
 
 
-                bloques = st.session_state.rangos_dinamicos.get(hoja_sel, [])
+                        st.warning("No se encontraron bloques de contenido para esta sección.")
 
 
 
@@ -856,16 +1021,17 @@ with col2:
 
 
 
+                    else:
 
 
 
 
 
-                if not bloques:
 
 
 
 
+                        st.subheader(f"Contenido de '{hoja_sel}'")
 
 
 
@@ -875,13 +1041,107 @@ with col2:
 
 
 
+                        for i, bloque in enumerate(bloques, 1):
 
-                    st.warning("No se encontraron bloques de contenido para esta sección.")
 
 
 
 
 
+
+
+
+                            st.markdown(f"**Bloque {i}:** Tipo=`{bloque['tipo']}`")
+
+
+
+
+
+
+
+
+
+                            if isinstance(bloque.get('contenido'), pd.DataFrame):
+
+
+
+
+
+
+
+
+
+                                st.table(bloque['contenido'])
+
+
+
+
+
+
+
+
+
+                            else:
+
+
+
+
+
+
+
+
+
+                                st.text_area(
+
+
+
+
+
+
+
+
+
+                                    f"Contenido del Bloque {i}",
+
+
+
+
+
+
+
+
+
+                                    value=str(bloque.get('contenido', '')),
+
+
+
+
+
+
+
+
+
+                                    height=100,
+
+
+
+
+
+
+
+
+
+                                    disabled=True,
+
+
+
+
+
+
+
+
+
+                                )
 
 
 
@@ -901,227 +1161,17 @@ with col2:
 
 
 
+                    st.info("Selecciona una hoja para ver su previsualización.")
 
 
 
 
 
-                    st.subheader(f"Contenido de '{hoja_sel}'")
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-                    for i, bloque in enumerate(bloques, 1):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        st.markdown(f"**Bloque {i}:** Tipo=`{bloque['tipo']}`")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        if isinstance(bloque.get('contenido'), pd.DataFrame):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            st.table(bloque['contenido'])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        else:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            st.text_area(
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                f"Contenido del Bloque {i}",
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                value=str(bloque.get('contenido', '')),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                height=100,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                disabled=True,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            else:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                st.info("Selecciona una hoja para ver su previsualización.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
-
-
-
-
-
+    
 
 
 
@@ -1141,9 +1191,14 @@ with col2:
 
 
 
-
-
-
-
-
         st.warning("El archivo fue cargado, pero no se encontraron secciones o bloques de contenido con los criterios actuales.")
+
+
+
+
+
+
+
+
+
+

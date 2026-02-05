@@ -69,7 +69,7 @@ class DictamenDesktopApp:
     def _load_initial_configs(self):
         """Carga las configuraciones JSON de forma segura usando el motor."""
         try:
-            self.rangos_estaticos = load_project_ranges()
+            self.rangos_estaticos = {} # Ya no se carga rangos_hojas.json
             self.formatos = load_project_formats()
         except Exception as e:
             self.formatos = None

@@ -61,7 +61,7 @@ def load_project_formats() -> dict | None:
 def discover_and_load_blocks(wb: Workbook, rangos_manuales: dict, formatos_config: dict | None) -> dict:
     """
     Analiza todas las hojas de un libro de Excel y carga los bloques de contenido
-    usando el método híbrido: automático primero, manual como fallback.
+    usando únicamente el método automático basado en códigos [[...]].
     """
     rangos_descubiertos = {}
     for sheet_name in wb.sheetnames:
@@ -70,27 +70,13 @@ def discover_and_load_blocks(wb: Workbook, rangos_manuales: dict, formatos_confi
         if not formatos_config:
             formatos_config = {}
 
-        # 1. Intentar extracción automática
+        # Intentar extracción automática basada en códigos [[...]]
         bloques_automaticos = extraer_bloques_desde_hoja(sheet_object, formatos_config)
         
+        # Si se encontraron bloques, se añaden a los resultados.
+        # Si no, la hoja simplemente se ignora.
         if bloques_automaticos:
             rangos_descubiertos[sheet_name] = bloques_automaticos
-        elif sheet_name in rangos_manuales:
-            # 2. Fallback: usar la configuración manual
-            parrafos, tablas = extraer_seccion_desde_hoja(wb[sheet_name], rangos_manuales[sheet_name])
-            
-            bloques = []
-            if parrafos:
-                for p in parrafos:
-                    bloques.append({'tipo': 'texto', 'contenido': p})
-            if tablas:
-                for t in tablas:
-                    bloques.append({'tipo': 'tabla', 'contenido': t})
-            
-            if bloques:
-                rangos_descubiertos[sheet_name] = bloques
-        else:
-            pass
 
     return rangos_descubiertos
 

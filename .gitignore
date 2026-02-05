@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+
+venv/
+.env
+
+debug_log.txt
+temp_excel_from_streamlit.xlsx
+
+.DS_Store
+Thumbs.db
