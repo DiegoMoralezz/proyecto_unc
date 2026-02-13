@@ -218,6 +218,9 @@ def _crear_tabla_clonada(
     Clona una tabla modelo, la rellena con datos y la inserta en la posición
     actual del documento para mantener el orden de los bloques.
     """
+    # Importación local para evitar dependencia a nivel de módulo si no se usa
+    from docx.table import _Cell
+
     # 1. Añadir un párrafo marcador temporal para saber dónde insertar la tabla.
     marker_paragraph = doc.add_paragraph()
     
@@ -228,45 +231,63 @@ def _crear_tabla_clonada(
     marker_paragraph._p.addnext(new_tbl_xml)
     
     # 4. Obtener una referencia al objeto de tabla recién insertado.
-    #    La tabla es ahora el último elemento del cuerpo, pero está en la posición correcta.
     new_table = doc.tables[-1]
 
     # 5. Eliminar el párrafo marcador que ya no es necesario.
-    #    Esto se hace eliminando el elemento del párrafo de su padre.
     p_element = marker_paragraph._p
     p_element.getparent().remove(p_element)
 
-    removed_model_row = False
-    if new_table.rows:
-        first_cell_text = new_table.cell(0, 0).text
-        if first_cell_text and first_cell_text.strip().startswith("[["):
-            new_table._tbl.remove(new_table.rows[0]._tr)
-            removed_model_row = True
+    # 6. Eliminar la fila del modelo si todavía existe
+    if new_table.rows and new_table.cell(0, 0).text.strip().startswith("[["):
+        new_table._tbl.remove(new_table.rows[0]._tr)
 
-    # --- A partir de aquí, la lógica es la misma que antes ---
-
-    # Forzar el ancho de las columnas para asegurar la consistencia
+    # 7. Forzar el ancho de las columnas para asegurar la consistencia
     if column_widths and len(new_table.columns) == len(column_widths):
         for i, width in enumerate(column_widths):
             new_table.columns[i].width = width
 
-    # Limpiar el ID del modelo de la primera celda
-    if new_table.rows and not removed_model_row:
-        first_cell = new_table.cell(0, 0)
-        if first_cell.text and first_cell.text.strip().startswith("[["):
-            first_cell.text = ""
-
-    # Ajustar el número de filas
+    # --- Lógica de población ---
     header_rows_count = max(int(config_tipo.get("header_rows", 1)), 0)
-    skip_excel_headers = config_tipo.get("skip_excel_headers", True)
-    if skip_excel_headers and header_rows_count and len(excel_rows) > header_rows_count:
-        excel_rows_data = excel_rows[header_rows_count:]
-    else:
-        excel_rows_data = excel_rows
 
+    # Separar encabezados y datos del Excel
+    excel_header_rows = excel_rows[:header_rows_count]
+    excel_rows_data = excel_rows[header_rows_count:]
+
+    # Sobrescribir los encabezados en la tabla de Word de forma segura
+    for i, excel_header_row in enumerate(excel_header_rows):
+        if i < len(new_table.rows) and i < header_rows_count:
+            table_header_row = new_table.rows[i]
+            # Acceso de bajo nivel para evitar el error 'no tr above'
+            tr = table_header_row._tr
+            for j, cell_data in enumerate(excel_header_row):
+                if j < len(tr.tc_lst):
+                    tc = tr.tc_lst[j]
+                    cell = _Cell(tc, table_header_row)
+                    
+                    # Aplicar formato inteligente para años en encabezados
+                    if isinstance(cell_data, float) and cell_data.is_integer():
+                        text_to_write = str(int(cell_data))
+                    else:
+                        text_to_write = str(cell_data) if cell_data is not None else ""
+                    
+                    if not cell.paragraphs:
+                        p = cell.add_paragraph()
+                    else:
+                        p = cell.paragraphs[0]
+                    
+                    if not p.runs:
+                        p.add_run(text_to_write)
+                    else:
+                        p.runs[0].text = text_to_write
+                        # Limpiar runs extra
+                        for k in range(len(p.runs) - 1, 0, -1):
+                            p._p.remove(p.runs[k]._r)
+
+    # Ajustar filas de datos
     if config_tipo.get("trim_leading_empty_rows"):
         while excel_rows_data and _fila_vacia(excel_rows_data[0]):
             excel_rows_data = excel_rows_data[1:]
+    
     if len(new_table.rows) <= header_rows_count: return
 
     model_data_rows_count = len(new_table.rows) - header_rows_count
@@ -300,16 +321,13 @@ def _crear_tabla_clonada(
                             p.add_run(texto)
                         else:
                             p.runs[0].text = texto
-                            # Limpiar runs extra si existían
                             for k in range(len(p.runs) - 1, 0, -1):
                                 p._p.remove(p.runs[k]._r)
                     
                     if p.runs:
-                        # Permitir configurar tipografǻa por tipo/columna; si no, respetar la plantilla.
                         font_name_cfg = config_tipo.get("font_name")
                         font_size_cfg = config_tipo.get("font_size")
                         column_font_sizes = config_tipo.get("column_font_size", {})
-                        # column_font_sizes puede venir como lista o dict con clave 0-based o 1-based
                         col_size = None
                         if isinstance(column_font_sizes, list):
                             if j < len(column_font_sizes):

@@ -30,6 +30,8 @@ if 'temp_file_path' not in st.session_state:
     st.session_state.temp_file_path = None
 if 'rangos_dinamicos' not in st.session_state:
     st.session_state.rangos_dinamicos = None
+if 'excel_sheet_order' not in st.session_state:
+    st.session_state.excel_sheet_order = None
 
 # ===================== LÓGICA REACTIVA CENTRAL (INPUT Y PROCESAMIENTO) ===================== #
 
@@ -61,6 +63,7 @@ if uploaded_file is not None and st.session_state.temp_file_path is None:
             st.session_state.rangos_dinamicos = discover_and_load_blocks(
                 wb, RANGOS_ESTATICOS, FORMATOS
             )
+            st.session_state.excel_sheet_order = wb.sheetnames # <- Added this line
         finally:
             # Paso clave: Liberar el objeto pesado de la memoria
             if wb:
@@ -75,6 +78,15 @@ if uploaded_file is not None and st.session_state.temp_file_path is None:
 
 st.title("Generador de Dictamen UNC (Refactorizado)")
 
+# Definir la lista de hojas disponibles una vez que se ha cargado el archivo
+hojas_disponibles = []
+if st.session_state.temp_file_path and st.session_state.rangos_dinamicos and st.session_state.excel_sheet_order:
+    detected_sheets_names = st.session_state.rangos_dinamicos.keys()
+    hojas_disponibles = [
+        sheet_name for sheet_name in st.session_state.excel_sheet_order
+        if sheet_name in detected_sheets_names
+    ]
+
 # --- Layout de dos columnas ---
 col1, col2 = st.columns([1, 2])
 
@@ -85,14 +97,18 @@ with col1:
         st.header("2. Generar y Descargar")
 
         if st.button("Generar DOCX final", type="primary", help="Crea el documento Word con el dictamen completo.", key="generate_button"):
-            with st.spinner("Generando documento final... Por favor espera."):
-                # Se llama a la nueva función encapsulada que gestiona la memoria internamente
-                st.session_state.buf_final = ejecutar_generacion_completa(
-                    workbook_path=st.session_state.temp_file_path,
-                    rangos_dinamicos=st.session_state.rangos_dinamicos,
-                    formatos=FORMATOS,
-                )
-            st.success("¡Documento generado con éxito!")
+            if not hojas_disponibles:
+                st.error("No hay hojas procesables para generar el documento.")
+            else:
+                with st.spinner("Generando documento final... Por favor espera."):
+                    # Pasar la lista de hojas en el orden correcto a la función de generación
+                    st.session_state.buf_final = ejecutar_generacion_completa(
+                        workbook_path=st.session_state.temp_file_path,
+                        rangos_dinamicos=st.session_state.rangos_dinamicos,
+                        formatos=FORMATOS,
+                        orden_hojas=hojas_disponibles
+                    )
+                st.success("¡Documento generado con éxito!")
 
         if st.session_state.buf_final:
             st.download_button(
@@ -108,10 +124,8 @@ with col1:
 
         st.markdown("---")
         if st.button("Empezar de Nuevo", help="Limpia la aplicación para procesar un nuevo archivo.", key="reset_button"):
-            # Limpiar todo el estado de la sesión para un reinicio limpio
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
-            # Podríamos también borrar el archivo temporal si existe, pero el SO lo suele gestionar.
             st.rerun()
     else:
         st.info("Sube un archivo para activar los controles.")
@@ -123,9 +137,7 @@ with col2:
     if not st.session_state.temp_file_path:
         st.info("Sube un archivo Excel para comenzar el análisis y la previsualización.")
 
-    elif st.session_state.rangos_dinamicos:
-        hojas_disponibles = [s for s in ORDER if s in st.session_state.rangos_dinamicos]
-        
+    elif hojas_disponibles:
         with st.expander("Ver Previsualización de Secciones", expanded=True):
             hoja_sel = st.selectbox(
                 "Selecciona una sección/hoja para previsualizar:",
@@ -153,5 +165,5 @@ with col2:
             else:
                 st.info("Selecciona una hoja para ver su previsualización.")
                 
-    elif st.session_state.temp_file_path and not st.session_state.rangos_dinamicos:
+    elif st.session_state.temp_file_path:
         st.warning("El archivo fue cargado, pero no se encontraron secciones o bloques de contenido con los criterios actuales.")

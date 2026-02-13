@@ -81,7 +81,7 @@
     },
     "tabla_ecc": {
       "table_model_id": "[[MODELO_ECC]]",
-      "header_rows": 1,
+      "header_rows": 2,
       "orientation": "landscape",
       "skip_excel_headers": false,
       "trim_leading_empty_rows": true

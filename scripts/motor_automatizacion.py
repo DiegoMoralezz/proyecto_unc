@@ -81,7 +81,7 @@ def discover_and_load_blocks(wb: Workbook, rangos_manuales: dict, formatos_confi
     return rangos_descubiertos
 
 def ejecutar_generacion_completa(
-    workbook_path: str, rangos_dinamicos: dict, formatos: dict | None
+    workbook_path: str, rangos_dinamicos: dict, formatos: dict | None, orden_hojas: list[str] | None = None
 ) -> BytesIO:
     """
     Encapsula la generación del DOCX final, gestionando la memoria de forma explícita.
@@ -100,7 +100,7 @@ def ejecutar_generacion_completa(
             wb=wb,
             rangos=rangos_dinamicos,
             plantilla_path=PLANTILLA_PATH,
-            orden=ORDER,
+            orden=orden_hojas, # Usar el orden pasado como parámetro
             formatos=formatos,
         )
         return buf
