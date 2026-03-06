@@ -1,4 +1,3 @@
-
 {
   "tipos": {
     "alcomite_informeaud": {
@@ -85,7 +84,6 @@
       "orientation": "landscape",
       "skip_excel_headers": false,
       "trim_leading_empty_rows": true
-
     },
     "tabla_cf": {
       "table_model_id": "[[MODELO_CF]]",
@@ -103,7 +101,14 @@
     "tabla_vencimientos": {
       "table_model_id": "[[MODELO_VENCIMIENTOS]]",
       "header_rows": 1
+    },
+    "tabla_derivados": {
+      "table_model_id": "[[MODELO_DERIVA]]",
+      "header_rows": 1
+    },
+    "tabla_subsiypatri": {
+      "table_model_id": "[[MODELO_SUBSIYPATRI]]",
+      "header_rows": 1
     }
   }
 }
-

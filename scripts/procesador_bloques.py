@@ -313,42 +313,56 @@ def _crear_tabla_clonada(
                     cell = table_row.cells[j]
                     texto = _formatear_celda_tabla(cell_data, table_row_index, j, config_tipo)
                     
+                    # 0. Asegurar que tenemos el párrafo de la celda actual
                     if not cell.paragraphs:
-                        p = cell.add_paragraph(texto)
+                        p = cell.add_paragraph()
                     else:
                         p = cell.paragraphs[0]
-                        if not p.runs:
-                            p.add_run(texto)
-                        else:
-                            p.runs[0].text = texto
-                            for k in range(len(p.runs) - 1, 0, -1):
-                                p._p.remove(p.runs[k]._r)
-                    
-                    if p.runs:
-                        font_name_cfg = config_tipo.get("font_name")
-                        font_size_cfg = config_tipo.get("font_size")
-                        column_font_sizes = config_tipo.get("column_font_size", {})
-                        col_size = None
-                        if isinstance(column_font_sizes, list):
-                            if j < len(column_font_sizes):
-                                col_size = column_font_sizes[j]
-                        elif isinstance(column_font_sizes, dict):
-                            col_size = column_font_sizes.get(j)
-                            if col_size is None:
-                                col_size = column_font_sizes.get(j + 1)
 
-                        if font_name_cfg:
-                            p.runs[0].font.name = str(font_name_cfg)
-                        if col_size is not None:
-                            try:
-                                p.runs[0].font.size = Pt(float(col_size))
-                            except Exception:
-                                pass
-                        elif font_size_cfg:
-                            try:
-                                p.runs[0].font.size = Pt(float(font_size_cfg))
-                            except Exception:
-                                pass
+                    # 1. Detectar fuente y tamaño de la plantilla (herencia de formato)
+                    template_font = None
+                    template_size = None
+                    if p.runs:
+                        template_font = p.runs[0].font.name
+                        if p.runs[0].font.size:
+                            template_size = p.runs[0].font.size.pt
+                    
+                    # 2. UNIFICAR Y ESCRIBIR EL CONTENIDO DEL EXCEL
+                    if not p.runs:
+                        new_run = p.add_run(texto)
+                    else:
+                        new_run = p.runs[0]
+                        new_run.text = texto
+                        # Limpiar cualquier otro run sobrante
+                        for k in range(len(p.runs) - 1, 0, -1):
+                            p._p.remove(p.runs[k]._r)
+                    
+                    # 3. Forzar fuente (JSON > Plantilla > Trebuchet MS)
+                    font_name_cfg = config_tipo.get("font_name")
+                    f_name = font_name_cfg or template_font or "Trebuchet MS"
+
+                    if f_name:
+                        new_run.font.name = f_name
+                        from docx.oxml.ns import qn
+                        rPr = new_run._element.get_or_add_rPr()
+                        rFonts = rPr.get_or_add_rFonts()
+                        rFonts.set(qn('w:ascii'), f_name)
+                        rFonts.set(qn('w:hAnsi'), f_name)
+                        rFonts.set(qn('w:cs'), f_name)
+
+                    # 4. Forzar tamaño (JSON > Plantilla > 10.0)
+                    column_font_sizes = config_tipo.get("column_font_size", {})
+                    col_size = None
+                    if isinstance(column_font_sizes, list) and j < len(column_font_sizes):
+                        col_size = column_font_sizes[j]
+                    elif isinstance(column_font_sizes, dict):
+                        col_size = column_font_sizes.get(j) or column_font_sizes.get(j + 1)
+                    
+                    f_size = col_size or config_tipo.get("font_size") or template_size or 10.0
+                    
+                    try:
+                        new_run.font.size = Pt(float(f_size))
+                    except: pass
 
 
 def _formatear_celda_tabla(
